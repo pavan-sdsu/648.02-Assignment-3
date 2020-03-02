@@ -6,7 +6,7 @@ const path = require("path");
 
 const PORT = 3000;
 
-let PRODUCTS = [{"Category":["Accessories"],"Price":"1123","Name":"Clarinet","Image":"https://via.placeholder.com/350x150","id":1},{"Category":["Shirts"],"Price":"10","Name":"Blue Tshirt","Image":"https://via.placeholder.com/350x150","id":2}]
+let PRODUCTS = []
 
 const resolvers = {
 	Query: {
@@ -36,4 +36,4 @@ server.applyMiddleware({ app });
 app.use(express.static(path.join(__dirname, "../public")));
 app.use(express.static(path.join(__dirname, "../static")));
 
-app.listen(PORT, () => console.log('Listening on PORT', PORT, server.graphqlPath));
+app.listen(PORT, () => console.log('Listening on PORT', PORT));

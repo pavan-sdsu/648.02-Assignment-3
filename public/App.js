@@ -7,10 +7,10 @@ class ProductAdd extends React.Component {
 	onSubmit(e) {
 		e.preventDefault();
 		const product = {
-			category: document.getElementById("category").value,
-			price: document.getElementById("price").value.slice(1),
-			name: document.getElementById("name").value,
-			image: document.getElementById("image").value
+			Category: document.getElementById("category").value,
+			Price: document.getElementById("price").value.slice(1),
+			Name: document.getElementById("name").value,
+			Image: document.getElementById("image").value
 		};
 		this.props.addProduct(product);
 	}
@@ -112,32 +112,32 @@ class ProductRow extends React.Component {
 	}
 
 	render() {
-		const { name, price, category, image } = this.props.product;
+		const { Name, Price, Category, Image } = this.props.product;
 		return React.createElement(
 			"tr",
 			null,
 			React.createElement(
 				"td",
 				null,
-				name
+				Name
 			),
 			React.createElement(
 				"td",
 				null,
 				"$",
-				price
+				Price
 			),
 			React.createElement(
 				"td",
 				null,
-				category
+				Category
 			),
 			React.createElement(
 				"td",
 				null,
 				React.createElement(
 					"a",
-					{ href: image, target: "_blank" },
+					{ href: Image, target: "_blank" },
 					"View"
 				)
 			)
@@ -209,14 +209,62 @@ class ProductList extends React.Component {
 			products: []
 		};
 		this.addProduct = this.addProduct.bind(this);
+		this.getProducts();
+	}
+
+	getProducts() {
+		const query = `
+		query {
+			productList {
+				id
+				Category
+				Price
+				Name
+				Image
+			}
+		}
+		`;
+
+		fetch('/graphql', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ query })
+		}).then(res => res.json()).then(res => {
+			this.setState((state, props) => {
+				state.products = res.data.productList;
+				return state;
+			});
+		}).catch(err => console.error(err));
 	}
 
 	addProduct(product) {
-		this.setState((state, props) => {
-			product["id"] = state.products.length + 1;
-			state.products.push(product);
-			return state;
-		});
+		const query = `
+		mutation {
+			addProduct (
+				Category: [` + product.Category + `]
+				Name: "` + product.Name + `"
+				Price: ` + product.Price + `
+				Image: "` + product.Image + `"
+			) {
+				id
+				Category
+				Price
+				Name
+				Image
+			}
+		}
+		`;
+
+		fetch('/graphql', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ query })
+		}).then(res => res.json()).then(res => {
+			this.setState((state, props) => {
+				state.products.push(res.data.addProduct);
+				return state;
+			});
+		}).catch(err => console.error(err));
 	}
 
 	render() {
